@@ -19,7 +19,7 @@ public class MainGameManager : MonoBehaviour
     // 좀비 줄
     const int MAX_LINE = 3;
 
-    Vector2[] spawnPos = { new Vector2(7f, -3.52f), new Vector2(7f, -3.32f), new Vector2(7f, -3.12f) };
+    Vector2 spawnPos = new Vector2(7f, -3f);
     private void Start()
     {
         currTime = 0f;
@@ -42,7 +42,7 @@ public class MainGameManager : MonoBehaviour
         int randomNum = Random.Range(0, MAX_LINE);
 
         currZombie.layer = LayerMask.NameToLayer("Monster" + (randomNum + 1).ToString());
-        currZombie.transform.position = spawnPos[randomNum];
+        currZombie.transform.position = spawnPos;
     }
 }
 

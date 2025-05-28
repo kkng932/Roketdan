@@ -5,6 +5,8 @@ TagManager:
   serializedVersion: 2
   tags:
   - Hero
+  - Box
+  - Monster
   layers:
   - Default
   - TransparentFX
