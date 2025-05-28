@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 public class MainGameManager : MonoBehaviour
 {
@@ -42,6 +43,7 @@ public class MainGameManager : MonoBehaviour
         int randomNum = Random.Range(0, MAX_LINE);
 
         currZombie.layer = LayerMask.NameToLayer("Monster" + (randomNum + 1).ToString());
+        currZombie.GetComponent<SortingGroup>().sortingOrder = MAX_LINE - randomNum;
         currZombie.transform.position = spawnPos;
     }
 }
