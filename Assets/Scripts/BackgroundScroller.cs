@@ -1,5 +1,5 @@
-using System.Collections;
-using System.Collections.Generic;
+﻿// 배경 스크롤러 
+
 using UnityEngine;
 
 public class BackgroundScroller : MonoBehaviour
@@ -29,6 +29,7 @@ public class BackgroundScroller : MonoBehaviour
     }
     private void Update()
     {
+        // 배경 이동 
         groundObj.transform.Translate(Vector2.left * groundSpeed * Time.deltaTime);
         backgroundObj.transform.Translate(Vector2.left * backgroundSpeed * Time.deltaTime);
 
