@@ -33,7 +33,7 @@ public class ZombieManager : MonoBehaviour
     }
     public void ChangeState(ZombieState newState)
     {
-        
+        Debug.Log("ChangeState: " + newState.ToString());
         currState?.Exit();
         currState = newState;
         currState.Enter();
@@ -112,7 +112,7 @@ public class ZombieWalkState : ZombieState
         {
             // 왼쪽에 접촉했을 때 
             Vector2 normal = collision.contacts[0].normal;
-            if (Vector2.Dot(normal, Vector2.right) > 0.5f)
+            if (normal.x >= 0.9f)
                 zombieMgr.ChangeState(new ZombieStopState(zombieMgr));
         }
     }
@@ -120,7 +120,7 @@ public class ZombieWalkState : ZombieState
 public class ZombieStopState : ZombieState
 {
     // 현재 줄 마지막인지
-    bool isLast = false;
+    bool isLast = true;
     // 마지막에 있고 지난 시간
     float lastTime = 0f;
     public ZombieStopState(ZombieManager zombieMgr) : base(zombieMgr) { }
@@ -137,8 +137,9 @@ public class ZombieStopState : ZombieState
         if (isLast)
         {
             lastTime += Time.deltaTime;
+            Debug.Log(lastTime);
             if (lastTime > 0.5f)
-            {
+            {                
                 zombieMgr.ChangeState(new ZombieClimbState(zombieMgr));
             }
         }
@@ -147,19 +148,29 @@ public class ZombieStopState : ZombieState
     {
         lastTime = 0f;
     }
+    public override void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("Monster"))
+        {
+            Vector2 normal = collision.contacts[0].normal;
+            Debug.Log(normal.x);
+            if (normal.x >= 0.9f)
+                isLast = true;
+        }
+    }
     public override void OnCollisionStay2D(Collision2D collision)
     {
         if(collision.gameObject.CompareTag("Monster"))
         {
             Vector2 normal = collision.contacts[0].normal;
-            // 뒤에 몬스터가 닿을 때
-            if (Vector2.Dot(normal, Vector2.left) > 0.5f)
+            if (normal.x <= -0.9f)
                 isLast = false;
         }
     }
+    
     public override void OnCollisionExit2D(Collision2D collision)
     {
-        zombieMgr.ChangeState(new ZombieWalkState(zombieMgr));
+        isLast = true;
     }
 
 }
