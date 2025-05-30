@@ -8,8 +8,12 @@ public class ZombieManager : MonoBehaviour
 {
     [SerializeField]
     float speed;
+    // 땅에서 점프할 때 힘
     [SerializeField]
-    float jumpForce;
+    float jumpForce1;
+    // 머리 위에서 점프할 때 힘
+    [SerializeField]
+    float jumpForce2;
 
     Rigidbody2D rb;
     Animator animator;
@@ -56,11 +60,20 @@ public class ZombieManager : MonoBehaviour
                 
                 Vector2 normal = collision.contacts[0].normal;
                 // 왼쪽이나 아래쪽에 몬스터가 닿으면 점프
-                if (Vector2.Dot(normal, Vector2.up) > 0.5f || Vector2.Dot(normal, Vector2.right) > 0.5f)
-                    Jump();
+
+                if (Vector2.Dot(normal, Vector2.right) > 0.5f)
+                    Jump(jumpForce1);
+                else if (Vector2.Dot(normal, Vector2.up) > 0.5f)
+                    Jump(jumpForce2);
+                
             }
         }
 
+    }
+    private void OnCollisionStay2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("Box"))
+            isTouchingBox = true;
     }
     private void OnCollisionExit2D(Collision2D collision)
     {
@@ -68,7 +81,7 @@ public class ZombieManager : MonoBehaviour
             isTouchingBox = false;
 
     }
-    void Jump()
+    void Jump(float jumpForce)
     {
         rb.velocity = new Vector2(rb.velocity.x, 0); // 기존 Y속도 제거
         rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
