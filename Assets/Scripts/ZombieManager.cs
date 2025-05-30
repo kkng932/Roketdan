@@ -13,19 +13,17 @@ public class ZombieManager : MonoBehaviour
 
     Rigidbody2D rb;
     Animator animator;
-    CapsuleCollider2D collider;
+    CapsuleCollider2D col;
 
     // 박스 닿아있는지 여부 
     bool isTouchingBox = false;
-    // 현재 충돌체 개수
-    int currCollisionNum = 0;
 
     Vector3 currCollisionPos;
     private void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
-        collider = GetComponent<CapsuleCollider2D>();
+        col = GetComponent<CapsuleCollider2D>();
     }
     
     void FixedUpdate()
@@ -41,11 +39,12 @@ public class ZombieManager : MonoBehaviour
         }
         if(collision.gameObject.CompareTag("Monster"))
         {
+            
             if(isTouchingBox)
             {
                 Vector2 contactPoint = collision.contacts[0].point;
                 currCollisionPos = contactPoint;
-                float topPos = transform.position.y + collider.offset.y + collider.size.y / 2f;
+                float topPos = transform.position.y + col.offset.y + col.size.y / 2f;
                 // 머리 위에 몬스터가 타면 밀려남
                 if (topPos <= contactPoint.y + 0.05f)
                 {
@@ -54,23 +53,19 @@ public class ZombieManager : MonoBehaviour
             }
             else
             {
-                currCollisionNum++;
+                
+                Vector2 normal = collision.contacts[0].normal;
+                // 왼쪽이나 아래쪽에 몬스터가 닿으면 점프
+                if (Vector2.Dot(normal, Vector2.up) > 0.5f || Vector2.Dot(normal, Vector2.right) > 0.5f)
+                    Jump();
             }
         }
 
-        if(!isTouchingBox && currCollisionNum == 1)
-            Jump();
     }
     private void OnCollisionExit2D(Collision2D collision)
     {
         if (collision.gameObject.CompareTag("Box"))
             isTouchingBox = false;
-        if (collision.gameObject.CompareTag("Monster"))
-        {
-            currCollisionNum--;
-            if(currCollisionNum < 0)
-                currCollisionNum = 0;
-        }
 
     }
     void Jump()
@@ -113,10 +108,10 @@ public class ZombieManager : MonoBehaviour
     // 위치 확인 디버깅 기즈모
     private void OnDrawGizmos()
     {
-        if (collider == null) return;
+        if (col == null) return;
         // 흰 원: collider 꼭대기 확인
         Gizmos.color = Color.white;
-        Gizmos.DrawSphere(transform.position + (Vector3)collider.offset + new Vector3(0f, collider.size.y / 2f, 0f), 0.1f);
+        Gizmos.DrawSphere(transform.position + (Vector3)col.offset + new Vector3(0f, col.size.y / 2f, 0f), 0.1f);
         // 노란 원: 충돌 위치 확인
         Gizmos.color = Color.yellow;
         Gizmos.DrawSphere(currCollisionPos, 0.1f);
