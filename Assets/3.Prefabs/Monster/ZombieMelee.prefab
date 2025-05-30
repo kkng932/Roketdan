@@ -73,6 +73,7 @@ MonoBehaviour:
   speed: 2
   jumpForce1: 13
   jumpForce2: 5
+  climbForce: 5
 --- !u!70 &9088538231220164464
 CapsuleCollider2D:
   m_ObjectHideFlags: 0

@@ -2,18 +2,18 @@
 
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 public class ZombieManager : MonoBehaviour
 {
+    // 이동 속도
     [SerializeField]
     float speed;
-    // 땅에서 점프할 때 힘
+    
+    // 맨 뒤 몬스터가 올라가는 힘
     [SerializeField]
-    float jumpForce1;
-    // 머리 위에서 점프할 때 힘
-    [SerializeField]
-    float jumpForce2;
+    float climbForce;
 
     Rigidbody2D rb;
     Animator animator;
@@ -61,15 +61,6 @@ public class ZombieManager : MonoBehaviour
                 // 오른쪽에 몬스터가 닿아있으면 중간에 있다고 판단
                 if (Vector2.Dot(normal, Vector2.left) > 0.5f)
                     isMiddle = true;
-
-                if(!isMiddle)
-                {
-                    // 왼쪽이나 아래쪽에 몬스터가 닿으면 점프
-                    if (Vector2.Dot(normal, Vector2.right) > 0.5f)
-                        Jump(jumpForce1);
-                    else if (Vector2.Dot(normal, Vector2.up) > 0.5f)
-                        Jump(jumpForce2);
-                }
             }
         }
 
@@ -84,6 +75,13 @@ public class ZombieManager : MonoBehaviour
             // 오른쪽에 몬스터가 닿아있으면 중간에 있다고 판단
             if (Vector2.Dot(normal, Vector2.left) > 0.5f)
                 isMiddle = true;
+            if(!isTouchingBox && !isMiddle)
+            {
+                if (normal.y >= 0f && normal.y < 0.8f)
+                    rb.velocity = new Vector2(-speed, climbForce * (1 - normal.y));
+                else
+                    rb.velocity = new Vector2(-speed, 0f);
+            }
         }
     }
     private void OnCollisionExit2D(Collision2D collision)
@@ -93,11 +91,6 @@ public class ZombieManager : MonoBehaviour
         if (collision.gameObject.CompareTag("Monster"))
             isMiddle = false;
 
-    }
-    void Jump(float jumpForce)
-    {
-        rb.velocity = new Vector2(rb.velocity.x, 0); // 기존 Y속도 제거
-        rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
     }
     void Attack()
     {
