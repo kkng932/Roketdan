@@ -21,8 +21,10 @@ public class ZombieManager : MonoBehaviour
 
     // 박스 닿아있는지 여부 
     bool isTouchingBox = false;
-
-    Vector3 currCollisionPos;
+    // 줄 중간에 있는지 여부
+    bool isMiddle = false;
+    // 현재 닿은 위치 
+    Vector3 contactPoint;
     private void Start()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -43,11 +45,10 @@ public class ZombieManager : MonoBehaviour
         }
         if(collision.gameObject.CompareTag("Monster"))
         {
-            
-            if(isTouchingBox)
+            Vector2 normal = collision.contacts[0].normal;
+            if (isTouchingBox)
             {
-                Vector2 contactPoint = collision.contacts[0].point;
-                currCollisionPos = contactPoint;
+                contactPoint = collision.contacts[0].point;
                 float topPos = transform.position.y + col.offset.y + col.size.y / 2f;
                 // 머리 위에 몬스터가 타면 밀려남
                 if (topPos <= contactPoint.y + 0.05f)
@@ -57,15 +58,18 @@ public class ZombieManager : MonoBehaviour
             }
             else
             {
-                
-                Vector2 normal = collision.contacts[0].normal;
-                // 왼쪽이나 아래쪽에 몬스터가 닿으면 점프
+                // 오른쪽에 몬스터가 닿아있으면 중간에 있다고 판단
+                if (Vector2.Dot(normal, Vector2.left) > 0.5f)
+                    isMiddle = true;
 
-                if (Vector2.Dot(normal, Vector2.right) > 0.5f)
-                    Jump(jumpForce1);
-                else if (Vector2.Dot(normal, Vector2.up) > 0.5f)
-                    Jump(jumpForce2);
-                
+                if(!isMiddle)
+                {
+                    // 왼쪽이나 아래쪽에 몬스터가 닿으면 점프
+                    if (Vector2.Dot(normal, Vector2.right) > 0.5f)
+                        Jump(jumpForce1);
+                    else if (Vector2.Dot(normal, Vector2.up) > 0.5f)
+                        Jump(jumpForce2);
+                }
             }
         }
 
@@ -74,11 +78,20 @@ public class ZombieManager : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Box"))
             isTouchingBox = true;
+        if(collision.gameObject.CompareTag("Monster"))
+        {
+            Vector2 normal = collision.contacts[0].normal;
+            // 오른쪽에 몬스터가 닿아있으면 중간에 있다고 판단
+            if (Vector2.Dot(normal, Vector2.left) > 0.5f)
+                isMiddle = true;
+        }
     }
     private void OnCollisionExit2D(Collision2D collision)
     {
         if (collision.gameObject.CompareTag("Box"))
             isTouchingBox = false;
+        if (collision.gameObject.CompareTag("Monster"))
+            isMiddle = false;
 
     }
     void Jump(float jumpForce)
@@ -127,6 +140,6 @@ public class ZombieManager : MonoBehaviour
         Gizmos.DrawSphere(transform.position + (Vector3)col.offset + new Vector3(0f, col.size.y / 2f, 0f), 0.1f);
         // 노란 원: 충돌 위치 확인
         Gizmos.color = Color.yellow;
-        Gizmos.DrawSphere(currCollisionPos, 0.1f);
+        Gizmos.DrawSphere(contactPoint, 0.1f);
     }
 }
