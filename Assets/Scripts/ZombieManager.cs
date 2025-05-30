@@ -13,16 +13,21 @@ public class ZombieManager : MonoBehaviour
 
     Rigidbody2D rb;
     Animator animator;
+    CapsuleCollider2D collider;
 
     // 박스 닿아있는지 여부 
     bool isTouchingBox = false;
     // 현재 충돌체 개수
     int currCollisionNum = 0;
+
+    Vector3 currCollisionPos;
     private void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
+        collider = GetComponent<CapsuleCollider2D>();
     }
+    
     void FixedUpdate()
     {
         rb.velocity = new Vector2(-speed, rb.velocity.y);
@@ -39,9 +44,10 @@ public class ZombieManager : MonoBehaviour
             if(isTouchingBox)
             {
                 Vector2 contactPoint = collision.contacts[0].point;
-                float yPos = transform.position.y;
-                
-                if (yPos < contactPoint.y)
+                currCollisionPos = contactPoint;
+                float topPos = transform.position.y + collider.offset.y + collider.size.y / 2f;
+                // 머리 위에 몬스터가 타면 밀려남
+                if (topPos <= contactPoint.y + 0.05f)
                 {
                     Push();
                 }
@@ -96,11 +102,23 @@ public class ZombieManager : MonoBehaviour
     IEnumerator IPush()
     {
         float time = 0f;
-        while(time < 1f)
+        float duration = 2f;
+        while(time < 2f)
         {
             time += Time.deltaTime;
-            transform.position = Vector2.Lerp(transform.position, new Vector2(0f,transform.position.y), time);
+            transform.position = Vector2.Lerp(transform.position, new Vector2(0f,transform.position.y), time / duration);
             yield return null;
         }
+    }
+    // 위치 확인 디버깅 기즈모
+    private void OnDrawGizmos()
+    {
+        if (collider == null) return;
+        // 흰 원: collider 꼭대기 확인
+        Gizmos.color = Color.white;
+        Gizmos.DrawSphere(transform.position + (Vector3)collider.offset + new Vector3(0f, collider.size.y / 2f, 0f), 0.1f);
+        // 노란 원: 충돌 위치 확인
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawSphere(currCollisionPos, 0.1f);
     }
 }
