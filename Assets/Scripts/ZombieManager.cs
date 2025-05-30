@@ -23,13 +23,6 @@ public class ZombieManager : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
     }
-    private void Update()
-    {
-        if(Input.GetMouseButtonDown(0))
-        {
-            Jump();
-        }
-    }
     void FixedUpdate()
     {
         rb.velocity = new Vector2(-speed, rb.velocity.y);
@@ -41,12 +34,25 @@ public class ZombieManager : MonoBehaviour
             isTouchingBox = true;
             Attack();
         }
-
-        if (!isTouchingBox && collision.gameObject.CompareTag("Monster"))
+        if(collision.gameObject.CompareTag("Monster"))
         {
-            currCollisionNum++;
+            if(isTouchingBox)
+            {
+                Vector2 contactPoint = collision.contacts[0].point;
+                float yPos = transform.position.y;
+                
+                if (yPos < contactPoint.y)
+                {
+                    Push();
+                }
+            }
+            else
+            {
+                currCollisionNum++;
+            }
         }
-        if(currCollisionNum == 1)
+
+        if(!isTouchingBox && currCollisionNum == 1)
             Jump();
     }
     private void OnCollisionExit2D(Collision2D collision)
@@ -72,7 +78,7 @@ public class ZombieManager : MonoBehaviour
     }
     public void OnAttack()
     {
-        Debug.Log("어택");
+        
     }
     IEnumerator IAttack()
     {
@@ -80,6 +86,21 @@ public class ZombieManager : MonoBehaviour
         {
             animator.Play("Attack");
             yield return new WaitForSeconds(1f);
+        }
+    }
+    // 밀려남 
+    void Push()
+    {
+        StartCoroutine(IPush());
+    }
+    IEnumerator IPush()
+    {
+        float time = 0f;
+        while(time < 1f)
+        {
+            time += Time.deltaTime;
+            transform.position = Vector2.Lerp(transform.position, new Vector2(0f,transform.position.y), time);
+            yield return null;
         }
     }
 }
