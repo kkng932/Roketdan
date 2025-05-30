@@ -97,10 +97,23 @@ public abstract class ZombieState
 public class ZombieWalkState : ZombieState
 {
     public ZombieWalkState(ZombieManager zombieMgr) : base(zombieMgr) { }
-
+    bool isLast = false;
+    float lastTime = 0f;
     public override void FixedUpdate()
     {
         zombieMgr.rb.velocity = new Vector2(-zombieMgr.speed, zombieMgr.rb.velocity.y);
+    }
+    public override void Update()
+    {
+        if(isLast)
+        {
+            lastTime += Time.deltaTime;
+            if (lastTime > 0.5f)
+            {
+                zombieMgr.ChangeState(new ZombieClimbState(zombieMgr));
+            }
+        }
+        
     }
     public override void OnCollisionEnter2D(Collision2D collision)
     {
@@ -113,67 +126,25 @@ public class ZombieWalkState : ZombieState
             // 왼쪽에 접촉했을 때 
             Vector2 normal = collision.contacts[0].normal;
             if (normal.x >= 0.9f)
-                zombieMgr.ChangeState(new ZombieStopState(zombieMgr));
-        }
-    }
-}
-public class ZombieStopState : ZombieState
-{
-    // 현재 줄 마지막인지
-    bool isLast = true;
-    // 마지막에 있고 지난 시간
-    float lastTime = 0f;
-    public ZombieStopState(ZombieManager zombieMgr) : base(zombieMgr) { }
-    public override void Enter()
-    {
-        lastTime = 0f;
-    }
-    public override void FixedUpdate()
-    {
-        zombieMgr.rb.velocity = new Vector2(0f, zombieMgr.rb.velocity.y);
-    }
-    public override void Update()
-    {
-        if (isLast)
-        {
-            lastTime += Time.deltaTime;
-            Debug.Log(lastTime);
-            if (lastTime > 0.5f)
-            {                
-                zombieMgr.ChangeState(new ZombieClimbState(zombieMgr));
-            }
-        }
-    }
-    public override void Exit()
-    {
-        lastTime = 0f;
-    }
-    public override void OnCollisionEnter2D(Collision2D collision)
-    {
-        if (collision.gameObject.CompareTag("Monster"))
-        {
-            Vector2 normal = collision.contacts[0].normal;
-            Debug.Log(normal.x);
-            if (normal.x >= 0.9f)
+            {
                 isLast = true;
+            }
         }
     }
     public override void OnCollisionStay2D(Collision2D collision)
     {
-        if(collision.gameObject.CompareTag("Monster"))
+        if (collision.gameObject.CompareTag("Monster"))
         {
+            // 오른쪽에 접촉했을 때 
             Vector2 normal = collision.contacts[0].normal;
             if (normal.x <= -0.9f)
+            {
                 isLast = false;
+            }
         }
     }
-    
-    public override void OnCollisionExit2D(Collision2D collision)
-    {
-        isLast = true;
-    }
-
 }
+
 public class ZombieClimbState : ZombieState
 {
     public ZombieClimbState(ZombieManager zombieMgr) : base(zombieMgr) { }
@@ -183,6 +154,7 @@ public class ZombieClimbState : ZombieState
             zombieMgr.ChangeState(new ZombieAttackState(zombieMgr));
         if (collision.gameObject.CompareTag("Monster"))
         {
+            // 닿은 좀비를 타고 앞으로 전진
             Vector2 normal = collision.contacts[0].normal;
             zombieMgr.rb.velocity = new Vector2(-zombieMgr.speed, zombieMgr.climbForce * (1 - normal.y));
         }
