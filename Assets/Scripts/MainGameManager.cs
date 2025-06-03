@@ -16,7 +16,7 @@ public class MainGameManager : Singleton<MainGameManager>
     // 현재 지난 시간
     float currTime;
     // 스폰 시간
-    float spawnTime = 2f;
+    float spawnTime = 1.6f;
 
     // 좀비 줄
     const int MAX_LINE = 3;
