@@ -75,7 +75,7 @@ MonoBehaviour:
   rb: {fileID: 0}
   animator: {fileID: 0}
   lastTouchBox: {fileID: 0}
-  attackDamage: 1
+  attackDamage: 7
 --- !u!70 &9088538231220164464
 CapsuleCollider2D:
   m_ObjectHideFlags: 0

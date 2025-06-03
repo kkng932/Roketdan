@@ -34,7 +34,7 @@ public class ZombieManager : MonoBehaviour
     }
     public void ChangeState(ZombieState newState)
     {
-        Debug.Log("ChangeState: " + newState.ToString());
+        //Debug.Log("ChangeState: " + newState.ToString());
         currState?.Exit();
         currState = newState;
         currState.Enter();
@@ -190,6 +190,14 @@ public class ZombieAttackState : ZombieState
     
     public override void OnCollisionStay2D(Collision2D collision)
     {
+        if(collision.gameObject.CompareTag("Box"))
+        {
+            if(collision.gameObject.TryGetComponent<BoxManager>(out BoxManager currBox))
+            {
+                if(currBox == null || currBox != zombieMgr.lastTouchBox)
+                    zombieMgr.lastTouchBox = currBox;
+            }
+        }
         if(collision.gameObject.CompareTag("Monster"))
         {
             Vector2 normal = collision.contacts[0].normal;
