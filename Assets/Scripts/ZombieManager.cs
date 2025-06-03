@@ -18,8 +18,6 @@ public class ZombieManager : MonoBehaviour
     public Animator animator;
     CapsuleCollider2D col;
 
-    // 현재 밀려나고 있는 중
-    bool isPushing = false;
     // 현재 닿은 위치 
     Vector3 contactPoint;
     // 마지막으로 닿은 박스
