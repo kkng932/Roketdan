@@ -22,6 +22,9 @@ public class ZombieManager : MonoBehaviour
     bool isPushing = false;
     // 현재 닿은 위치 
     Vector3 contactPoint;
+    // 마지막으로 닿은 박스
+    public BoxManager lastTouchBox;
+    public float attackDamage;
 
     private void Start()
     {
@@ -63,7 +66,8 @@ public class ZombieManager : MonoBehaviour
     
     public void OnAttack()
     {
-        
+        if (lastTouchBox == null) return;
+        lastTouchBox.TakeDamage(attackDamage);
     }
     
     // 위치 확인 디버깅 기즈모
@@ -119,6 +123,7 @@ public class ZombieWalkState : ZombieState
     {
         if(collision.gameObject.CompareTag("Box"))
         {
+            zombieMgr.lastTouchBox = collision.gameObject.GetComponentInParent<BoxManager>();
             zombieMgr.ChangeState(new ZombieAttackState(zombieMgr));
         }
         if(collision.gameObject.CompareTag("Monster"))
@@ -184,6 +189,7 @@ public class ZombieAttackState : ZombieState
             yield return new WaitForSeconds(1f);
         }
     }
+    
     public override void OnCollisionStay2D(Collision2D collision)
     {
         if(collision.gameObject.CompareTag("Monster"))

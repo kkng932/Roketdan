@@ -71,9 +71,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 2
-  jumpForce1: 13
-  jumpForce2: 5
   climbForce: 5
+  rb: {fileID: 0}
+  animator: {fileID: 0}
+  lastTouchBox: {fileID: 0}
+  attackDamage: 1
 --- !u!70 &9088538231220164464
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
