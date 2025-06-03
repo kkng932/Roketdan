@@ -2,8 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
+using System.Linq;
 
-public class MainGameManager : MonoBehaviour
+public class MainGameManager : Singleton<MainGameManager>
 {
     // 좀비 프리팹
     [SerializeField]
@@ -21,6 +22,12 @@ public class MainGameManager : MonoBehaviour
     const int MAX_LINE = 3;
 
     Vector2 spawnPos = new Vector2(7f, -3f);
+
+    // 가장 앞에 있는 좀비 위치 
+    public Transform firstZombieTrs;
+    List<Transform> zombieTrs = new List<Transform>();
+
+    
     private void Start()
     {
         currTime = 0f;
@@ -31,12 +38,16 @@ public class MainGameManager : MonoBehaviour
         if (currTime > spawnTime)
         {
             currTime = 0f;
-            SpawnZombie();
+            zombieTrs.Add(SpawnZombie().transform);
         }
+        if(zombieTrs.Count > 0) 
+            firstZombieTrs = zombieTrs
+                .OrderBy(t => t.position.x)
+                .First();
     }
 
     // 좀비 스폰 
-    private void SpawnZombie()
+    private GameObject SpawnZombie()
     {
         GameObject currZombie = Instantiate(zombiePrf, zombiePrt);
         
@@ -45,6 +56,13 @@ public class MainGameManager : MonoBehaviour
         currZombie.layer = LayerMask.NameToLayer("Monster" + (randomNum + 1).ToString());
         currZombie.GetComponent<SortingGroup>().sortingOrder = MAX_LINE - randomNum;
         currZombie.transform.position = spawnPos;
+        return currZombie;
+    }
+    public void DestroyZombie(Transform zombie)
+    {
+        Debug.Log("DetroyZombie");
+        zombieTrs.Remove(zombie);
+        Debug.Log(zombieTrs.Count);
     }
 }
 

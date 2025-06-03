@@ -96,6 +96,7 @@ GameObject:
   - component: {fileID: 1289778038360852145}
   - component: {fileID: 264201622896902502}
   - component: {fileID: 5073113412821751280}
+  - component: {fileID: 1850249580193414530}
   m_Layer: 0
   m_Name: Hero
   m_TagString: Untagged
@@ -243,3 +244,18 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 5
+--- !u!114 &1850249580193414530
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8958240697474582917}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7e33b9d5b3ff66a44ac04763527366e0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gunTrs: {fileID: 9115941406881483208}
+  bulletPrf: {fileID: 7249734377803097066, guid: 8bc1d31f08463ac47b42af4be51bed71, type: 3}
+  bulletCoolTime: 1

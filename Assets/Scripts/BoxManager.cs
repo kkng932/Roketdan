@@ -44,7 +44,7 @@ public class BoxManager : MonoBehaviour
         currHp -= damage;
         Flash();
         SetHP(currHp);
-        if (currHp < 0f)
+        if (currHp <= 0f)
             Destroy(gameObject);
     }
     private void Flash()

@@ -24,6 +24,8 @@ public class ZombieManager : MonoBehaviour
     public BoxManager lastTouchBox;
     public float attackDamage;
 
+    public float hp = 100;
+
     private void Start()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -67,6 +69,23 @@ public class ZombieManager : MonoBehaviour
         if (lastTouchBox == null) return;
         lastTouchBox.TakeDamage(attackDamage);
     }
+
+    // 맞음
+    public void TakeDamage(float damage)
+    {
+        hp -= damage;
+        if (hp <= 0) 
+            Die();
+    }
+    private void Die()
+    {
+        ChangeState(new ZombieDieState(this));
+    }
+    public void OnDie()
+    {
+        MainGameManager.Instance.DestroyZombie(transform);
+        Destroy(gameObject);
+    }
     
     // 위치 확인 디버깅 기즈모
     private void OnDrawGizmos()
@@ -100,7 +119,10 @@ public class ZombieWalkState : ZombieState
 {
     public ZombieWalkState(ZombieManager zombieMgr) : base(zombieMgr) { }
     bool isLast = false;
-    float lastTime = 0f;
+    // 타고 올라가기 전 시간 
+    float currTime = 0f;
+    // 타고 올라가기 시작할 시간 
+    float lastTime = 0.3f;
     public override void FixedUpdate()
     {
         zombieMgr.rb.velocity = new Vector2(-zombieMgr.speed, zombieMgr.rb.velocity.y);
@@ -109,8 +131,8 @@ public class ZombieWalkState : ZombieState
     {
         if(isLast)
         {
-            lastTime += Time.deltaTime;
-            if (lastTime > 0.5f)
+            currTime += Time.deltaTime;
+            if (currTime > lastTime)
             {
                 zombieMgr.ChangeState(new ZombieClimbState(zombieMgr));
             }
@@ -224,5 +246,13 @@ public class ZombieAttackState : ZombieState
         }
         isPushing = false;
         zombieMgr.ChangeState(new ZombieWalkState(zombieMgr));
+    }
+}
+public class ZombieDieState : ZombieState
+{
+    public ZombieDieState(ZombieManager zombieMgr) : base(zombieMgr) { }
+    public override void Enter()
+    {
+        zombieMgr.animator.Play("Die");
     }
 }
